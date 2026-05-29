@@ -209,7 +209,7 @@ const chartSvg = (() =>
 {
   const width = 590;
   const height = 500;
-  const margin = {top: 30, right: 100, bottom: 40, left: 120};
+  const margin = {top: 80, right: 100, bottom: 40, left: 120};
 
   const electionData = president_data
     .filter(d => d.year === yearFilter.toString() && d.candidatevotes > 2500 && d.candidate !== "" && d.candidate.length < 20);
@@ -254,12 +254,17 @@ const chartSvg = (() =>
     .attr("width", width)
     .attr("height", height);
 
+  const legend = svg.append('g')
+    .attr('transform', 'translate(400, 10)')
+    .call(colorLegend);
+
   svg.append("g")
     .attr("transform", `translate(0, ${height - margin.bottom})`)
     .call(d3.axisBottom(x).ticks(5, "~s"))
     .append("text")
       .attr("text-anchor", "end")
-      .attr("font-size", "40px")
+      .attr("fill", "white")
+      .attr("font-size", "12px")
       .attr("font-weight", "bold")
       .attr("x", width - margin.right)
       .attr("y", -10)
@@ -271,6 +276,7 @@ const chartSvg = (() =>
     .append("text")
       .attr("transform", `translate(-10, ${margin.top - 10})`)
       .attr("text-anchor", "end")
+      .attr("fill", "currentColor")
       .attr("font-size", "12px")
       .attr("font-weight", "bold")
       .text("Candidates");
@@ -294,6 +300,7 @@ const chartSvg = (() =>
     .data(filteredCandidates)
     .join("text")
       .attr("font-size", "12px")
+      .attr("fill", "currentColor")
       .attr("class", "label")
       .attr("x", d => x(d.votes) + 5)
       .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
@@ -315,7 +322,7 @@ function colorLegend(container) {
   container.append("text")
     .attr("x", 0)
     .attr("y", 0)
-    .attr("fill", "black")
+    .attr("fill", "currentColor")
     .attr("font-weight", "bold")
     .attr("font-size", "12px")
     .text("Political Party");
@@ -333,7 +340,7 @@ function colorLegend(container) {
   entries.append("text")
     .attr("x", 2 * entryRadius + labelOffset)
     .attr("y", baselineOffset)
-    .attr("fill", "black")
+    .attr("fill", "currentColor")
     .attr("font-size", "11px")
     .text(d => d.label);
 }
