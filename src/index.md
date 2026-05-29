@@ -259,7 +259,6 @@ const chartSvg = (() =>
     .call(d3.axisBottom(x).ticks(5, "~s"))
     .append("text")
       .attr("text-anchor", "end")
-      .attr("fill", "black")
       .attr("font-size", "12px")
       .attr("font-weight", "bold")
       .attr("x", width - margin.right)
@@ -272,7 +271,6 @@ const chartSvg = (() =>
     .append("text")
       .attr("transform", `translate(-10, ${margin.top - 10})`)
       .attr("text-anchor", "end")
-      .attr("fill", "black")
       .attr("font-size", "12px")
       .attr("font-weight", "bold")
       .text("Candidates");
