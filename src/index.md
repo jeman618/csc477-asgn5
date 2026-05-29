@@ -259,7 +259,7 @@ const chartSvg = (() =>
     .call(d3.axisBottom(x).ticks(5, "~s"))
     .append("text")
       .attr("text-anchor", "end")
-      .attr("font-size", "12px")
+      .attr("font-size", "40px")
       .attr("font-weight", "bold")
       .attr("x", width - margin.right)
       .attr("y", -10)
