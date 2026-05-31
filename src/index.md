@@ -23,13 +23,21 @@ const parties = [
 const color = d3.scaleOrdinal()
   .domain([0, 1, 2])
   .range(["blue", "red", "green"]);
+const state_winners = [
+  { index: 0, label: 'Democratic' },
+  { index: 1, label: 'Republican' },
+  { index: 2, label: 'Swing' }
+];
+const state_color = d3.scaleOrdinal()
+  .domain([0, 1, 2])
+  .range(["blue", "red", "url(#white-stripes)"]);
 ```
 
 ```js
 const yearInput = 
   Scrubber(d3.range(years[0], years[1] + 1, 4), {
     autoplay: false,
-    delay: 1000,
+    delay: 2000,
     loop: false
   });
 ```
@@ -73,7 +81,6 @@ container.style.marginTop = "20px";
 container.style.paddingRight = "0px";
 mapSvg.style.flex = "2";
 chartSvg.style.flex = "1";
-
 
 container.appendChild(mapSvg);
 container.appendChild(chartSvg);
@@ -138,7 +145,11 @@ const mapSvg = (() =>
   
   addStripePattern("blue-stripes", "blue");
   addStripePattern("red-stripes", "red");
-  addStripePattern("green-stripes", "green");
+  addStripePattern("white-stripes", "white");
+
+  const legend = svg.append('g')
+    .attr("transform", "translate(725, 80)")
+    .call(colorMapLegend);
 
   function update(yearFilter) {
     const electionData = president_data.filter(d => d.year === yearFilter.toString() && d.candidate !== "" && d.candidatevotes > 0);
@@ -212,7 +223,7 @@ const chartSvg = (() =>
   const margin = {top: 80, right: 100, bottom: 40, left: 120};
 
   const electionData = president_data
-    .filter(d => d.year === yearFilter.toString() && d.candidatevotes > 2500 && d.candidate !== "" && d.candidate.length < 20);
+      .filter(d => d.year === yearFilter.toString() && d.candidatevotes > 2500 && d.candidate !== "" && d.candidate.length < 20);
 
   const electionByCandidate = d3.group(electionData, d => d.candidate);
 
@@ -241,6 +252,39 @@ const chartSvg = (() =>
 
   const totalVotes = d3.rollup(votesByCandidate, v => d3.sum(v, d => d.votes));
 
+  const svg = d3.create("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  svg.append("text")
+    .attr("x", width / 2 + margin.right - 20)
+    .attr("y", 500)
+    .attr("text-anchor", "end")
+    .attr("fill", "currentColor")
+    .attr("font-size", "12px")
+    .attr("font-weight", "bold")
+    .text("Total Votes (Millions)");
+
+  svg.append("text")
+      .attr("x", margin.left)
+      .attr("y", margin.top - 20)
+      .attr("transform", `translate(-10, 10)`)
+      .attr("text-anchor", "middle")
+      .attr("fill", "currentColor")
+      .attr("font-size", "12px")
+      .attr("font-weight", "bold")
+      .text("Candidates");
+
+  const legend = svg.append('g')
+    .attr('transform', 'translate(400, 10)')
+    .call(colorLegend);
+
+  const xAxis = svg.append("g")
+  .attr("transform", `translate(0, ${height - margin.bottom})`);
+
+  const yAxis = svg.append("g")
+    .attr("transform", `translate(${margin.left}, 0)`);
+
   const x = d3.scaleLinear()
     .domain([0, d3.max(filteredCandidates, d => d.votes) * 1.2])
     .range([margin.left, width - margin.right]);
@@ -250,64 +294,121 @@ const chartSvg = (() =>
     .range([margin.top, height - margin.bottom])
     .padding(0.2);
 
-  const svg = d3.create("svg")
-    .attr("width", width)
-    .attr("height", height);
+  function update(yearFilter) {
 
-  const legend = svg.append('g')
-    .attr('transform', 'translate(400, 10)')
-    .call(colorLegend);
+    const t = svg.transition()
+      .duration(800)
+      .ease(d3.easeCubic);
 
-  svg.append("g")
-    .attr("transform", `translate(0, ${height - margin.bottom})`)
-    .call(d3.axisBottom(x).ticks(5, "~s"))
-    .append("text")
-      .attr("text-anchor", "end")
-      .attr("fill", "white")
-      .attr("font-size", "12px")
-      .attr("font-weight", "bold")
-      .attr("x", width - margin.right)
-      .attr("y", -10)
-      .text("Total Votes (Millions)");
+    svg.selectAll("rect")
+    .data(filteredCandidates, d => d.candidate)
+    .join(
+      enter => enter.append("rect")
+        .attr("x", margin.left + 1)
+        .attr("y", height - margin.bottom)
+        .attr("height", 0)
+        .attr("width", d => x(d.votes) - margin.left)
+        .attr("fill", d => {
+          const candidate = electionByCandidate.get(d.candidate)[0];
 
-  svg.append("g")
-    .attr("transform", `translate(${margin.left}, 0)`)
-    .call(d3.axisLeft(y))
-    .append("text")
-      .attr("transform", `translate(-10, ${margin.top - 10})`)
-      .attr("text-anchor", "end")
-      .attr("fill", "currentColor")
-      .attr("font-size", "12px")
-      .attr("font-weight", "bold")
-      .text("Candidates");
-
-  svg.selectAll("rect")
-    .data(filteredCandidates)
-    .join("rect")
-      .attr("x", margin.left)
-      .attr("y", d => y(d.candidate))
-      .attr("width", d => x(d.votes) - margin.left)
-      .attr("height", y.bandwidth())
-      .attr("fill", d => {
-        const candidate = electionByCandidate.get(d.candidate)[0];
-        
-        return candidate.party_simplified === "DEMOCRAT" ? "blue" :
+          return candidate.party_simplified === "DEMOCRAT" ? "blue" :
             candidate.party_simplified === "REPUBLICAN" ? "red" :
             "green";
-      });
+        })
+        .call(enter => enter.transition(t)
+          .attr("y", d => y(d.candidate))
+          .attr("height", y.bandwidth())
+        ),
 
-  svg.selectAll("text.label")
-    .data(filteredCandidates)
-    .join("text")
-      .attr("font-size", "12px")
+      update => update
+        .call(update => update.transition(t)
+          .attr("x", margin.left)
+          .attr("y", d => y(d.candidate))
+          .attr("height", y.bandwidth())
+          .attr("width", d => x(d.votes) - margin.left)
+        ),
+
+      exit => exit
+        .call(exit => exit.transition(t)
+          .attr('y', height - margin.bottom)
+          .attr("width", 0)
+          .remove()
+        )
+    );
+
+    svg.selectAll("text.label")
+    .data(filteredCandidates, d => d.candidate)
+    .join(
+      enter => enter
+      .append("text")
+        .attr("class", "label")
+        .attr("font-size", "12px")
+        .attr("fill", "currentColor")
+        .attr("x", d => x(d.votes) + 5)
+        .attr("y", d => height - margin.bottom)
+        .attr("dy", "0.35em")
+        .style("opacity", 0)
+        .text(d => `${d.votes.toLocaleString()} (${(100 * Number(d.votes) / totalVotes).toFixed(2)}%)`)
+        .call(enter => enter.transition(t)
+          .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
+          .style("opacity", 1)
+        ),
+
+      update => update
+        .text(d => `${d.votes.toLocaleString()} (${(100 * Number(d.votes) / totalVotes).toFixed(2)}%)`)
+        .call(update => update.transition(t)
+          .attr("x", d => x(d.votes) + 5)
+          .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
+        ),
+
+      exit => exit
+        .call(exit => exit.transition(t)
+          .attr("y", height - margin.bottom)
+          .attr("height", 0)
+          .remove()
+        )
+    );
+
+    svg.selectAll("text.candidate-label")
+  .data(filteredCandidates, d => d.candidate)
+  .join(
+    enter => enter.append("text")
+      .attr("class", "candidate-label")
       .attr("fill", "currentColor")
-      .attr("class", "label")
-      .attr("x", d => x(d.votes) + 5)
-      .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
-      .attr("dy", "0.35em")
-      .text(d => `${d.votes.toLocaleString()} (${(100 * Number(d.votes) / totalVotes).toFixed(2)}%)`);
+      .attr("font-size", "12px")
+      .attr("x", margin.left - 10)
+      .attr("y", height - margin.bottom)
+      .attr("text-anchor", "end")
+      .attr("dominant-baseline", "middle")
+      .text(d => d.candidate)
+      .call(enter => enter.transition(t)
+        .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
+      ),
 
-  return svg.node()
+    update => update
+      .call(update => update.transition(t)
+        .attr("y", d => y(d.candidate) + y.bandwidth() / 2)
+      ),
+
+    exit => exit
+      .call(exit => exit.transition(t)
+        .attr("y", height - margin.bottom)
+        .style("opacity", 0)
+        .remove()
+      )
+  );
+
+    xAxis.transition(t).call(d3.axisBottom(x).ticks(5, "~s"));
+
+    yAxis.transition(t)
+      .call(d3.axisLeft(y));
+
+    yAxis.selectAll(".tick text").remove();
+
+  }
+  update(yearFilter);
+  
+  return Object.assign(svg.node(), { update });
 })();
 ```
 
@@ -335,6 +436,7 @@ function colorLegend(container) {
   entries.append("circle")
     .attr("cx", entryRadius)
     .attr("r", entryRadius)
+    .attr("stroke", "black")
     .attr("fill", d => color(d.index));
 
   entries.append("text")
@@ -344,4 +446,43 @@ function colorLegend(container) {
     .attr("font-size", "11px")
     .text(d => d.label);
 }
+```
+
+```js
+function colorMapLegend(container) {
+    const titlePadding = 14;
+    const entrySpacing = 16;
+    const entrySize = 12;
+    const labelOffset = 4;
+    const baselineOffset = 4;
+  
+    const title = container.append('text')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('fill', 'currentColor')
+      .attr('font-family', 'Helvetica Neue, Arial')
+      .attr('font-weight', 'bold')
+      .attr('font-size', '12px')
+      .text('Winner');
+  
+    const entries = container.selectAll('g')
+      .data(state_winners)
+      .join('g')
+        .attr('transform', d => `translate(0, ${titlePadding + d.index * entrySpacing})`);
+  
+    const symbols = entries.append('rect')
+      .attr('width', entrySize)
+      .attr('height', entrySize)
+      .attr("stroke", "black")
+      .attr('fill', d => state_color(d.index));
+  
+    const labels = entries.append('text')
+      .attr('x', entrySize + labelOffset)
+      .attr('y', entrySize - 2)
+      .attr('fill', 'currentColor')
+      .attr('font-family', 'Helvetica Neue, Arial')
+      .attr('font-size', '11px')
+      .style('user-select', 'none')
+      .text(d => d.label);
+  }
 ```
