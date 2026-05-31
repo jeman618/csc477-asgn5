@@ -3,7 +3,7 @@
 <style>
   @media (min-width: calc(640px + 5rem + 192px)) {
     #observablehq-toc ~ #observablehq-main {
-      /* padding-right: calc(192px + 1rem); */
+      padding-right: 0;
     }
     #observablehq-toc {
       display: block;
@@ -18,7 +18,7 @@
     }
     #observablehq-sidebar-toggle:checked ~ #observablehq-center #observablehq-toc ~ #observablehq-main,
     #observablehq-sidebar-toggle:indeterminate ~ #observablehq-center #observablehq-toc ~ #observablehq-main {
-      /* padding-right: calc(192px + 1rem); */
+      padding-right: 0;
     }
   }
 </style>
