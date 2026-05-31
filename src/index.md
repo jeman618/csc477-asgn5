@@ -1,4 +1,28 @@
 # US Election Years (1976-2024)
+<!-- Removes right padding -->
+<style>
+  @media (min-width: calc(640px + 5rem + 192px)) {
+    #observablehq-toc ~ #observablehq-main {
+      /* padding-right: calc(192px + 1rem); */
+    }
+    #observablehq-toc {
+      display: block;
+    }
+  }
+
+  @media (min-width: calc(640px + 7rem + 272px + 192px)) {
+    #observablehq-sidebar-toggle:checked ~ #observablehq-center #observablehq-toc,
+    #observablehq-sidebar-toggle:indeterminate ~ #observablehq-center #observablehq-toc,
+    #observablehq-toc {
+      display: block;
+    }
+    #observablehq-sidebar-toggle:checked ~ #observablehq-center #observablehq-toc ~ #observablehq-main,
+    #observablehq-sidebar-toggle:indeterminate ~ #observablehq-center #observablehq-toc ~ #observablehq-main {
+      /* padding-right: calc(192px + 1rem); */
+    }
+  }
+</style>
+
 <div class="grid grid-cols-3">
   <div class="card"><h1>Question 1: Which elections showed the most political divide?</h1></div>
   <div class="card"><h1>Question 2: Who were the top candidates in each state?</h1></div>
