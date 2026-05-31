@@ -1,5 +1,14 @@
 # Asgn5
 
+## Write Up
+I wanted to answer the question on a choropleth map because that is how every news agency visualizes election data. When the user hovers over a state, I wanted to show total votes for each candidate and their party, so I grouped each state and got candidates and their parties for each of them. I also showed swing states as denoted by black stripes if the race there was extremely close. I included a legend for who won a state for clarity. There is also a widget that goes through the 1976-2024 elections because it would not be as interesting if my visualization only had one election.
+
+After finishing it, I figured including a bar chart showing total votes for each candidate would compliment it well. I only plotted candidates with more than 2,500 votes because in more recent elections there have been a lot more candidates. Including all of them would create a lot of clutter and fixing that would require making the chart larger than the choropleth, which I did not want. I also mitigated that by including a button that controls how many candidates are plotted. Any candidates that are not Democratic nor Republican are green because including colors for each party when only two are actual competitors is pointless. It is also animated so that the bars go from bottom to top.
+
+I got the dataset from [Harvard Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/42MVDX). It only contains the popular vote and not the electoral vote. Some data is missing for some candidates in certain states on certain election years, such as their political party and even their name.
+
+<hr>
+
 This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
 
 ```

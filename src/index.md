@@ -61,7 +61,7 @@ const state_color = d3.scaleOrdinal()
 const yearInput = 
   Scrubber(d3.range(years[0], years[1] + 1, 4), {
     autoplay: false,
-    delay: 2000,
+    delay: 1500,
     loop: false
   });
 ```
@@ -115,7 +115,7 @@ display(container);
 ```js
 const mapSvg = (() => 
 {
-  const width = 975;
+  const width = 900;
   const height = 610;
 
   const svg = d3.create('svg')
@@ -244,7 +244,7 @@ const chartSvg = (() =>
 {
   const width = 590;
   const height = 500;
-  const margin = {top: 80, right: 100, bottom: 40, left: 120};
+  const margin = {top: 80, right: 100, bottom: 40, left: 130};
 
   const electionData = president_data
       .filter(d => d.year === yearFilter.toString() && d.candidatevotes > 2500 && d.candidate !== "" && d.candidate.length < 20);
